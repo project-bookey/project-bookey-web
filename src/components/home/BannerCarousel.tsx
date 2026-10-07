@@ -5,20 +5,19 @@ import { useRef, useState, type ReactNode } from 'react';
 
 import type { Banner } from '@/lib/types';
 
-const CARD_H = 108;
-
 /**
- * 홈 최상단 이벤트 배너 — 가로로 한 장씩 넘기는 캐러셀(스크롤 스냅) + 표식.
+ * 홈 이벤트 배너 — 가로로 한 장씩 넘기는 캐러셀(스크롤 스냅) + 표식. `tall` 이면 넓은 화면에서 더 높다.
  * 사진 위 영역이라 모드와 무관하게 어두운 톤이다. 배너가 없으면 같은 높이의 '이벤트 준비 중' 띠로 자리를 지킨다.
  * 링크가 바깥 주소면 새 탭, 앱 안 경로면 설치 안내 페이지(/app)로.
  */
-export function BannerCarousel({ banners }: { banners: Banner[] }) {
+export function BannerCarousel({ banners, tall = false }: { banners: Banner[]; tall?: boolean }) {
   const listRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(0);
+  const heightClass = tall ? 'h-[108px] md:h-[180px]' : 'h-[108px]';
 
   if (banners.length === 0) {
     return (
-      <div className="flex items-center justify-center rounded-md border border-dashed border-line-strong" style={{ height: CARD_H }}>
+      <div className={`flex items-center justify-center rounded-md border border-dashed border-line-strong ${heightClass}`}>
         <span className="t-mono-label text-text-faint">이벤트 준비 중</span>
       </div>
     );
@@ -32,7 +31,7 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <div ref={listRef} onScroll={onScroll} className="shelf snap-x snap-mandatory rounded-md" style={{ height: CARD_H }}>
+      <div ref={listRef} onScroll={onScroll} className={`shelf snap-x snap-mandatory rounded-md ${heightClass}`}>
         {banners.map((banner) => (
           <BannerLink key={banner.id} banner={banner}>
             <div
@@ -45,10 +44,10 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
                   <div className="absolute inset-0 bg-black/45" aria-hidden />
                 </>
               ) : null}
-              <div className="relative flex flex-col gap-[2px] p-3">
+              <div className="relative flex flex-col gap-[2px] p-3 md:p-5">
                 <span className="t-mono-eyebrow mb-1 self-start rounded-sm bg-on-photo px-[6px] py-[2px] text-[#0c0e0d]">EVENT</span>
-                <p className="t-body-strong truncate text-on-photo">{stripStrong(banner.title)}</p>
-                {banner.subtitle ? <p className="t-caption truncate text-on-photo-muted">{stripStrong(banner.subtitle)}</p> : null}
+                <p className={`truncate text-on-photo ${tall ? 't-body-strong md:text-[20px] md:leading-7' : 't-body-strong'}`}>{stripStrong(banner.title)}</p>
+                {banner.subtitle ? <p className="t-caption truncate text-on-photo-muted md:text-[14px]">{stripStrong(banner.subtitle)}</p> : null}
               </div>
             </div>
           </BannerLink>

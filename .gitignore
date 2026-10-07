@@ -42,3 +42,6 @@ next-env.d.ts
 
 # 예시 환경 파일은 커밋한다
 !.env.example
+
+# IDE
+.idea/

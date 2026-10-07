@@ -40,7 +40,7 @@ export default async function ReviewPage({ params }: Props) {
   const review = await loadReview((await params).id);
   const detail = await settle(bookApi.detail(review.bookId), 'book');
   return (
-    <div className="content flex flex-col gap-5 pt-4">
+    <div className="content-narrow flex flex-col gap-5 pt-4 md:pt-8">
       <ReviewCard review={review} bookTitle={detail?.book.title} />
       {detail ? (
         <Link href={`/books/${detail.book.id}`} className="pressable flex items-center gap-3 rounded-md border border-line bg-surface p-3" aria-label={`${detail.book.title} 책 정보`}>

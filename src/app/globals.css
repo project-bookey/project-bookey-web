@@ -171,12 +171,29 @@
 }
 
 @layer components {
-  /* 본문 폭 — 모바일 우선, 데스크톱에서는 가운데 640px 한 단. */
+  /* 본문 폭 — 휴대폰은 꽉 채우고, 데스크톱은 1120px 안에서 여러 단으로 편다. 읽는 글(독후감·리뷰·약관)은 .content-narrow(720px). */
   .content {
     width: 100%;
-    max-width: 640px;
+    max-width: 1120px;
     margin-inline: auto;
     padding-inline: 16px;
+  }
+  .content-narrow {
+    width: 100%;
+    max-width: 720px;
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+  @media (min-width: 768px) {
+    .content,
+    .content-narrow {
+      padding-inline: 24px;
+    }
+  }
+  @media (min-width: 1200px) {
+    .content {
+      padding-inline: 32px;
+    }
   }
 
   /* 눌림 피드백 — 글자·행·아이콘 버튼 모두 한 값(앱 pressedStyle). */

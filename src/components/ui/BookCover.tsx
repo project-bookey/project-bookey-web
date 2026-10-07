@@ -1,6 +1,7 @@
 /**
  * 책 표지 — 2:3 판에 사진, 없으면 세리프 제목을 세운 장정판. 콜라주 기울기는 tilt(도)로.
  * 사진은 출처 호스트가 제각각이라 <img loading="lazy"> 로 그대로 보여 준다.
+ * `fluid` 면 칸 폭을 꽉 채운다(그리드 칸) — 비율만 2:3 으로 지킨다.
  */
 export function BookCover({
   uri,
@@ -9,6 +10,7 @@ export function BookCover({
   tilt = 0,
   className = '',
   priority = false,
+  fluid = false,
 }: {
   uri?: string | null;
   title?: string | null;
@@ -17,6 +19,7 @@ export function BookCover({
   className?: string;
   /** 첫 화면에 바로 보이는 표지(상세 히어로)는 지연 로딩하지 않는다. */
   priority?: boolean;
+  fluid?: boolean;
 }) {
   const height = Math.round(width * 1.5);
   const compact = width < 56;
@@ -25,7 +28,7 @@ export function BookCover({
   return (
     <div
       className={`relative shrink-0 overflow-hidden rounded-sm border border-line bg-book-board ${className}`}
-      style={{ width, height, transform: tilt ? `rotate(${tilt}deg)` : undefined }}
+      style={fluid ? { width: '100%', aspectRatio: '2 / 3', transform: tilt ? `rotate(${tilt}deg)` : undefined } : { width, height, transform: tilt ? `rotate(${tilt}deg)` : undefined }}
     >
       {uri ? (
         <img

@@ -22,7 +22,7 @@ export default async function FaqPage() {
   const groups = groupByCategory(faqs);
 
   return (
-    <div className="content flex flex-col gap-6 pt-4">
+    <div className="content-narrow flex flex-col gap-6 pt-4 md:pt-8">
       <h1 className="t-title-serif text-text">자주 묻는 질문</h1>
       {groups.length === 0 ? (
         <EmptyState title="아직 올라온 질문이 없어요" description="궁금한 점은 메일로 물어봐 주세요." />

@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function LegalPage({ params }: Props) {
   const document = await loadDocument((await params).key);
   return (
-    <article className="content flex flex-col gap-4 pt-4">
+    <article className="content-narrow flex flex-col gap-4 pt-4 md:pt-8">
       <header>
         <h1 className="t-title-serif text-text">{document.title}</h1>
         <p className="t-mono-label mt-1 text-text-faint">

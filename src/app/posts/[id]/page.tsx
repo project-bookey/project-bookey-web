@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PostPage({ params }: Props) {
   const post = await loadPost((await params).id);
   return (
-    <article className="content flex flex-col gap-5 pt-4">
+    <article className="content-narrow flex flex-col gap-5 pt-4 md:pt-8">
       <h1 className="t-display-serif break-keep text-text" style={{ fontSize: 26, lineHeight: '34px' }}>
         {post.title}
       </h1>

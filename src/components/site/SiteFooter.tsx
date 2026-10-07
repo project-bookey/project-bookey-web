@@ -1,32 +1,61 @@
 import Link from 'next/link';
 
-/** 바닥글 — 약관·개인정보·환불, FAQ, 문의 메일, 앱 설치 안내 페이지. */
+import { Wordmark } from './Wordmark';
+
+const BROWSE = [
+  ['/', '홈'],
+  ['/plaza', '광장'],
+  ['/search', '책 찾기'],
+  ['/app', '앱 설치'],
+] as const;
+
+const GUIDE = [
+  ['/legal/terms', '이용약관'],
+  ['/legal/privacy-policy', '개인정보처리방침'],
+  ['/legal/refund', '환불 정책'],
+  ['/faq', '자주 묻는 질문'],
+] as const;
+
+/** 바닥글 — 데스크톱은 세 단(브랜드 · 둘러보기 · 안내), 휴대폰은 차례로 쌓인다. */
 export function SiteFooter({ supportEmail }: { supportEmail: string }) {
-  const linkClass = 'pressable inline-flex min-h-11 items-center text-[13px] font-bold text-text-muted';
+  const linkClass = 'pressable inline-flex min-h-10 items-center text-[13px] font-bold text-text-muted';
   return (
-    <footer className="mt-12 border-t border-line">
-      <div className="content py-6">
-        <nav className="flex flex-wrap gap-x-5 gap-y-0" aria-label="사이트 안내">
-          <Link href="/legal/terms" className={linkClass}>
-            이용약관
-          </Link>
-          <Link href="/legal/privacy-policy" className={linkClass}>
-            개인정보처리방침
-          </Link>
-          <Link href="/legal/refund" className={linkClass}>
-            환불 정책
-          </Link>
-          <Link href="/faq" className={linkClass}>
-            자주 묻는 질문
-          </Link>
-          <a href={`mailto:${supportEmail}`} className={linkClass}>
-            문의
-          </a>
-          <Link href="/app" className={linkClass}>
-            앱 설치
-          </Link>
+    <footer className="mt-16 border-t border-line bg-bg-alt/60">
+      <div className="content grid gap-8 py-10 md:grid-cols-[1.4fr_1fr_1fr]">
+        <div>
+          <Wordmark width={100} />
+          <p className="t-body mt-3 max-w-xs break-keep text-text-muted">독서 기록과 독후감이 모이는 곳. 웹에서는 둘러보고, 기록은 앱에서 남겨요.</p>
+          <p className="t-caption mt-4 text-text-faint">© {new Date().getFullYear()} Bookey</p>
+        </div>
+        <nav aria-label="둘러보기">
+          <p className="t-mono-eyebrow mb-2 text-text-faint">둘러보기</p>
+          <ul className="flex flex-wrap gap-x-5 md:flex-col md:gap-0">
+            {BROWSE.map(([href, label]) => (
+              <li key={href}>
+                <Link href={href} className={linkClass}>
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </nav>
-        <p className="t-caption mt-3 text-text-faint">© {new Date().getFullYear()} Bookey. 독서 기록과 독후감이 모이는 곳.</p>
+        <nav aria-label="안내">
+          <p className="t-mono-eyebrow mb-2 text-text-faint">안내</p>
+          <ul className="flex flex-wrap gap-x-5 md:flex-col md:gap-0">
+            {GUIDE.map(([href, label]) => (
+              <li key={href}>
+                <Link href={href} className={linkClass}>
+                  {label}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <a href={`mailto:${supportEmail}`} className={linkClass}>
+                문의
+              </a>
+            </li>
+          </ul>
+        </nav>
       </div>
     </footer>
   );

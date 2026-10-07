@@ -46,7 +46,7 @@ export default async function UserPage({ params, searchParams }: Props) {
   const posts = await postApi.byUser(profile.userId, page, PAGE_SIZE);
 
   return (
-    <div className="content flex flex-col gap-6 pt-4">
+    <div className="content flex flex-col gap-6 pt-4 md:pt-8">
       <section className="flex items-start gap-4">
         <Avatar uri={profile.avatarUrl} nickname={profile.nickname} size={72} />
         <div className="min-w-0 flex-1">
@@ -74,7 +74,7 @@ export default async function UserPage({ params, searchParams }: Props) {
 
       <section>
         <SectionHeader title="독후감" />
-        <PostList posts={posts.content ?? []} emptyTitle="아직 공개한 독후감이 없어요" />
+        <PostList posts={posts.content ?? []} columns={2} emptyTitle="아직 공개한 독후감이 없어요" />
         <Pagination page={page} hasNext={posts.hasNext ?? false} totalPages={posts.totalPages} hrefFor={(p) => `/users/${profile.userId}${p > 0 ? `?page=${p}` : ''}`} />
       </section>
     </div>

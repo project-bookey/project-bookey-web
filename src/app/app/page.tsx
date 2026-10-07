@@ -19,7 +19,7 @@ export default function AppPage() {
   ].filter((entry): entry is [string, string] => Boolean(entry[1]));
 
   return (
-    <div className="content flex flex-col gap-6 pt-8">
+    <div className="content-narrow flex flex-col gap-6 pt-8 md:pt-12">
       <picture>
         <source srcSet="/brand/mark-on-dark.png" media="(prefers-color-scheme: dark)" />
         <img src="/brand/mark-on-light.png" alt="" width={72} height={72} className="rounded-md" />
