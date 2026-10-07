@@ -31,8 +31,8 @@ jobs:
         with:
           push: true
           tags: |
-            ghcr.io/project-bookey/project-bookey-web:latest
-            ghcr.io/project-bookey/project-bookey-web:sha-${{ github.sha }}
+            ghcr.io/bottleone/project-bookey-web:latest
+            ghcr.io/bottleone/project-bookey-web:sha-${{ github.sha }}
 ```
 
 ## 2. 환경 변수 (`/opt/bookey/.env` 등)
@@ -52,7 +52,7 @@ compose 서비스 예:
 
 ```yaml
   web:
-    image: ghcr.io/project-bookey/project-bookey-web:latest
+    image: ghcr.io/bottleone/project-bookey-web:latest
     restart: unless-stopped
     depends_on: [backend]
     ports: ["127.0.0.1:3200:3000"]
