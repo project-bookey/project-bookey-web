@@ -1,0 +1,69 @@
+name: Deploy web to EC2
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bookey-web-production
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm run typecheck
+
+  deploy:
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+      EC2_USER: ${{ secrets.EC2_USER }}
+      EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+      EC2_SSH_KNOWN_HOSTS: ${{ secrets.EC2_SSH_KNOWN_HOSTS }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure SSH
+        run: |
+          set -euo pipefail
+          : "${EC2_HOST:?Missing EC2_HOST}"
+          : "${EC2_USER:?Missing EC2_USER}"
+          : "${EC2_SSH_KEY:?Missing EC2_SSH_KEY}"
+          : "${EC2_SSH_KNOWN_HOSTS:?Missing EC2_SSH_KNOWN_HOSTS}"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$EC2_SSH_KEY" > ~/.ssh/bookey.pem
+          chmod 600 ~/.ssh/bookey.pem
+          printf '%s\n' "$EC2_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Package and upload
+        run: |
+          set -euo pipefail
+          tar --exclude='.git' --exclude='node_modules' --exclude='.next' --exclude='.env*' --exclude='*.pem' -czf /tmp/bookey-web.tgz .
+          scp -o BatchMode=yes -o ConnectTimeout=15 -i ~/.ssh/bookey.pem /tmp/bookey-web.tgz "${EC2_USER}@${EC2_HOST}:/tmp/bookey-web.tgz"
+      - name: Deploy and check health
+        run: |
+          ssh -o BatchMode=yes -o ConnectTimeout=15 -i ~/.ssh/bookey.pem "${EC2_USER}@${EC2_HOST}" bash -s <<'REMOTE'
+            set -euo pipefail
+            APP_DIR=/opt/bookey-web
+            mkdir -p "$APP_DIR"
+            STAGING=$(mktemp -d "$APP_DIR/release.XXXXXX")
+            trap 'rm -rf "$STAGING"' EXIT
+            tar -xzf /tmp/bookey-web.tgz -C "$STAGING"
+            cd "$STAGING"
+            docker compose build web
+            docker compose up -d --wait --wait-timeout 180 web
+            curl --fail --retry 12 --retry-delay 5 http://127.0.0.1:3200/health
+          REMOTE
