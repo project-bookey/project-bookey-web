@@ -76,12 +76,20 @@ jobs:
             APP_DIR=/opt/bookey-web
             mkdir -p "$APP_DIR"
             STAGING=$(mktemp -d "$APP_DIR/release.XXXXXX")
-            trap 'rm -rf "$STAGING"' EXIT
+            trap 'rm -rf "$STAGING"' ERR
             tar -xzf /tmp/bookey-web.tgz -C "$STAGING"
+            if [ -f "$APP_DIR/.env" ]; then
+              cp "$APP_DIR/.env" "$STAGING/.env"
+            fi
             cd "$STAGING"
             docker compose build web
             docker compose up -d --wait --wait-timeout 180 web
             curl --fail --retry 12 --retry-delay 5 http://127.0.0.1:3200/health
+            PREVIOUS=$(readlink "$APP_DIR/current" || true)
+            ln -sfn "$STAGING" "$APP_DIR/current"
+            case "$PREVIOUS" in
+              "$APP_DIR"/release.*) [ "$PREVIOUS" = "$STAGING" ] || rm -rf "$PREVIOUS" ;;
+            esac
           REMOTE
       - name: Remove temporary SSH access
         if: ${{ always() && steps.ssh_access.outputs.rule_id != '' }}

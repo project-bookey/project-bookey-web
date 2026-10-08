@@ -1,6 +1,10 @@
 .git
+.github
 node_modules
 .next
+docs
+*.md
 .env*
+!.env.example
 *.pem
 *.tsbuildinfo

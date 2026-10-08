@@ -1,5 +1,433 @@
-:root { color-scheme: light; font-family: Arial, sans-serif; background: #f8f5ef; color: #283c32; }
-body { margin: 0; }
-main { max-width: 800px; margin: 20vh auto; padding: 24px; }
-h1 { font-size: clamp(2rem, 6vw, 3.5rem); line-height: 1.25; }
-p { line-height: 1.7; }
+@import "tailwindcss";
+
+/*
+ * 콜라주 책상 — 앱(project-bookey-app/src/theme/palette.ts·tokens.ts)과 같은 토큰.
+ * 라이트 값이 기본이고, 기기 설정이 어두우면 다크 값으로 바뀐다. 색은 늘 var(--…) 로 읽는다 — 그래야 두 모드가 어긋나지 않는다.
+ */
+:root {
+  color-scheme: light dark;
+
+  --bg: #faf8f4;
+  --bg-alt: #f4f1ea;
+  --surface: #ffffff;
+  --surface-raised: #efece4;
+  --surface-deep: #f1eee6;
+  --paper-alt: #f0eadf;
+  --text: #1a1c18;
+  --text-muted: #57554f;
+  --text-faint: #8b887f;
+  --mid: #6e6b63;
+  --line: #e5e1d7;
+  --line-strong: #cfcabc;
+  --control: #858277;
+  --accent: #177a54;
+  --on-accent: #ffffff;
+  --accent-soft: #ddf2e7;
+  --warn: #8a5a12;
+  --warn-soft: #fdf0d5;
+  --danger: #b3362b;
+  --danger-soft: #fbe4e1;
+  --scrim-dim: rgba(0, 0, 0, 0.45);
+  --scrim-stop: rgba(0, 0, 0, 0.85);
+  --dot-grid: #e7e3d9;
+  --note: #177a54;
+  --on-note: #ffffff;
+  --ink: #1a1c18;
+  --on-ink: #faf8f4;
+  --tonal: #ebe7dc;
+  --thumb: #ffffff;
+  --memo-pad: #fbf9f2;
+  --on-memo-pad: #3b3d38;
+  --book-board: #d9d2c2;
+  --book-page: #e1dccf;
+  --book-band: #171a16;
+  --on-book-band: #e8e6e1;
+  /* 사진 위에 얹는 글자 — 모드와 무관하게 늘 밝은 잉크(뒤가 늘 어두운 사진). */
+  --on-photo: #e8e6e1;
+  --on-photo-muted: #9a9790;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0c0e0d;
+    --bg-alt: #131413;
+    --surface: #171a16;
+    --surface-raised: #1d211c;
+    --surface-deep: #141712;
+    --paper-alt: #20251f;
+    --text: #e8e6e1;
+    --text-muted: #9a9790;
+    --text-faint: #6f6d66;
+    --mid: #8c8981;
+    --line: #23261f;
+    --line-strong: #33372e;
+    --control: #77746c;
+    --accent: #3ddc97;
+    --on-accent: #0c0e0d;
+    --accent-soft: #16352a;
+    --warn: #f0b429;
+    --warn-soft: #38290f;
+    --danger: #ff6b60;
+    --danger-soft: #3a1714;
+    --scrim-dim: rgba(0, 0, 0, 0.55);
+    --dot-grid: #1b1e1a;
+    --note: #3ddc97;
+    --on-note: #0c0e0d;
+    --ink: #e8e6e1;
+    --on-ink: #0c0e0d;
+    --tonal: #2a2f28;
+    --thumb: #3a4037;
+    --memo-pad: #e9e4d6;
+    --on-memo-pad: #2a2c27;
+    --book-board: #1e221d;
+    --book-page: #e1dccf;
+    --book-band: #e8e6e1;
+    --on-book-band: #0c0e0d;
+  }
+}
+
+/* Tailwind 유틸리티 이름 — bg-bg · text-text-muted · border-line 처럼 쓴다. 값은 위 변수라 모드를 따라간다. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-alt: var(--bg-alt);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-deep: var(--surface-deep);
+  --color-paper-alt: var(--paper-alt);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+  --color-mid: var(--mid);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-control: var(--control);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-scrim-dim: var(--scrim-dim);
+  --color-note: var(--note);
+  --color-on-note: var(--on-note);
+  --color-ink: var(--ink);
+  --color-on-ink: var(--on-ink);
+  --color-tonal: var(--tonal);
+  --color-thumb: var(--thumb);
+  --color-memo-pad: var(--memo-pad);
+  --color-on-memo-pad: var(--on-memo-pad);
+  --color-book-board: var(--book-board);
+  --color-book-page: var(--book-page);
+  --color-book-band: var(--book-band);
+  --color-on-book-band: var(--on-book-band);
+  --color-on-photo: var(--on-photo);
+  --color-on-photo-muted: var(--on-photo-muted);
+
+  /* 서체 — 고운바탕 하나(앱과 같다). next/font 가 --font-gowun 을 채운다. */
+  --font-sans: var(--font-gowun), "Gowun Batang", "Apple SD Gothic Neo", "Noto Sans KR", serif;
+
+  /* 형태 — 오려 낸 종이처럼 각진 네모. 누르는 것(버튼·칩)만 살짝 둥글다. */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-control: 3px;
+  --radius-button: 4px;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background-color: var(--bg);
+    /* 도트 종이 질감 — 16px 간격 1px 점(앱 DotGridBackground 와 같은 CSS). */
+    background-image: radial-gradient(circle, var(--dot-grid) 1px, transparent 1px);
+    background-size: 16px 16px;
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 22px;
+    letter-spacing: -0.2px;
+    -webkit-font-smoothing: antialiased;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  img {
+    display: block;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+  }
+  /* 포커스 링 — 키보드로 다닐 때만 잉크 테두리. */
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* 본문 폭 — 휴대폰은 꽉 채우고, 데스크톱은 1120px 안에서 여러 단으로 편다. 읽는 글(독후감·리뷰·약관)은 .content-narrow(720px). */
+  .content {
+    width: 100%;
+    max-width: 1120px;
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+  .content-narrow {
+    width: 100%;
+    max-width: 720px;
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+  @media (min-width: 768px) {
+    .content,
+    .content-narrow {
+      padding-inline: 24px;
+    }
+  }
+  @media (min-width: 1200px) {
+    .content {
+      padding-inline: 32px;
+    }
+  }
+
+  /* 눌림 피드백 — 글자·행·아이콘 버튼 모두 한 값(앱 pressedStyle). */
+  .pressable {
+    transition: opacity 120ms ease-out;
+  }
+  .pressable:active {
+    opacity: 0.72;
+  }
+
+  /* 타입 스케일 — 위계는 크기 + 굵기(400/700)로. */
+  .t-display-serif {
+    font-size: 30px;
+    line-height: 40px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .t-title-serif {
+    font-size: 22px;
+    line-height: 30px;
+    font-weight: 700;
+  }
+  .t-section {
+    font-size: 17px;
+    line-height: 24px;
+    font-weight: 700;
+  }
+  .t-body {
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .t-body-strong {
+    font-size: 15px;
+    line-height: 22px;
+    font-weight: 700;
+  }
+  .t-label {
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: 700;
+  }
+  .t-caption {
+    font-size: 12px;
+    line-height: 17px;
+  }
+  .t-quote {
+    font-size: 17px;
+    line-height: 28px;
+  }
+  .t-mono-label {
+    font-size: 11px;
+    line-height: 15px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+  .t-mono-eyebrow {
+    font-size: 10px;
+    line-height: 14px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+  }
+  .t-mono-numeral {
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .t-meta {
+    font-size: 10px;
+    line-height: 14px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+  }
+
+  /* 여러 줄 말줄임. */
+  .clamp-1,
+  .clamp-2,
+  .clamp-3,
+  .clamp-4,
+  .clamp-6,
+  .clamp-8 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .clamp-1 {
+    -webkit-line-clamp: 1;
+  }
+  .clamp-2 {
+    -webkit-line-clamp: 2;
+  }
+  .clamp-3 {
+    -webkit-line-clamp: 3;
+  }
+  .clamp-4 {
+    -webkit-line-clamp: 4;
+  }
+  .clamp-6 {
+    -webkit-line-clamp: 6;
+  }
+  .clamp-8 {
+    -webkit-line-clamp: 8;
+  }
+
+  /* 가로 선반 — 스크롤바 없이 손가락으로 민다. */
+  .shelf {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .shelf::-webkit-scrollbar {
+    display: none;
+  }
+  .shelf > * {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  /* 사진 위 글씨를 읽히는 그라데이션(독후감 카드 포스터·배너). */
+  .scrim-up {
+    background-image: linear-gradient(to top, var(--scrim-stop), transparent);
+  }
+
+  /* 넘어올 때 살짝 올라오며 나타나는 조각(오늘의 글·한 줄평). */
+  .settle-in {
+    animation: settle-in 250ms ease-out both;
+  }
+  @keyframes settle-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .settle-in {
+      animation: none;
+    }
+  }
+
+  /* 독후감 본문 마크다운 — 조각·사진은 따로 그리고 글만 여기로 온다. */
+  .prose-post {
+    font-size: 15px;
+    line-height: 25px;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  .prose-post > * + * {
+    margin-top: 12px;
+  }
+  .prose-post h1,
+  .prose-post h2,
+  .prose-post h3 {
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  .prose-post h1 {
+    font-size: 20px;
+  }
+  .prose-post h2 {
+    font-size: 18px;
+  }
+  .prose-post h3 {
+    font-size: 16px;
+  }
+  .prose-post ul,
+  .prose-post ol {
+    padding-left: 22px;
+  }
+  .prose-post ul {
+    list-style: disc;
+  }
+  .prose-post ol {
+    list-style: decimal;
+  }
+  .prose-post li + li {
+    margin-top: 4px;
+  }
+  .prose-post a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose-post code {
+    font-size: 13px;
+    background: var(--surface-raised);
+    padding: 1px 4px;
+    border-radius: 2px;
+  }
+  .prose-post pre {
+    overflow-x: auto;
+    background: var(--surface-raised);
+    padding: 12px;
+    border-radius: 4px;
+  }
+  .prose-post pre code {
+    background: none;
+    padding: 0;
+  }
+  .prose-post hr {
+    border: 0;
+    border-top: 1px solid var(--line);
+  }
+  .prose-post blockquote {
+    border-left: 2px solid var(--line-strong);
+    padding-left: 12px;
+    color: var(--text-muted);
+  }
+  .prose-post img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 2px;
+  }
+  .prose-post table {
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .prose-post th,
+  .prose-post td {
+    border: 1px solid var(--line);
+    padding: 4px 8px;
+  }
+
+  /* 약관 원문 — 줄바꿈 그대로. */
+  .legal-body {
+    white-space: pre-wrap;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    font-size: 14px;
+    line-height: 24px;
+  }
+}
