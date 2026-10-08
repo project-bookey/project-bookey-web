@@ -6,7 +6,7 @@
     "Action": "sts:AssumeRoleWithWebIdentity",
     "Condition": {"StringEquals": {
       "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-      "token.actions.githubusercontent.com:sub": "repo:project-bookey/project-bookey-web:environment:production"
+      "token.actions.githubusercontent.com:sub": "repo:project-bookey@322972644/project-bookey-web@1409518620:environment:production"
     }}
   }]
 }
