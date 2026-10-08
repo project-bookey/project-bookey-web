@@ -1,8 +1,10 @@
-node_modules
-.next
 .git
 .github
+node_modules
+.next
 docs
 *.md
 .env*
 !.env.example
+*.pem
+*.tsbuildinfo

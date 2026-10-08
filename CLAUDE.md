@@ -19,7 +19,7 @@ Bookey 의 **조회 전용 공개 웹** — `https://www.bookey.site`. Next.js 1
 ## Commands
 
 ```bash
-npm run dev         # http://localhost:3000 — .env.local 의 BOOKEY_API_URL 을 본다(없으면 운영 API)
+npm run dev         # http://localhost:3200 — .env.local 의 BOOKEY_API_URL 을 본다(없으면 운영 API)
 npm run typecheck   # tsc --noEmit
 npm run lint        # eslint (react-hooks 규칙 포함 — 효과 안 setState 금지, 렌더 중 변수 재할당 금지)
 npm run build       # next build — CI 가 셋 다 돌린다(.github/workflows/ci.yml)
@@ -56,7 +56,7 @@ node scripts/screenshot.mjs http://127.0.0.1:3456/plaza shot.png [--dark] [--cli
 ## Architecture
 
 - **넓은 화면 레이아웃** (2026-10-07 사용자 결정 — 잡지형·서점형·앱 홈 그대로 넓힌 안을 비교해 **잡지형** 채택): 본문 폭은 `.content`(1120px) 또는 읽는 글의 `.content-narrow`(720px). 홈은 표제 + 검색 머리띠 아래 본문(오늘의 글 → 요즘 많이 읽는 책 → 추천)과 오른쪽 사이드바(앱 설치 카드 · 배너 · 인기 순위)의 두 단(`HomeMagazine`, 데이터는 `HomeData.ts`); 휴대폰에서는 사이드바가 아래로 내려간다. 헤더는 넓은 화면에서 워드마크 120 · 홈·광장·책 찾기 · 검색 칸 · '앱 설치', 바닥글은 세 단. 광장·프로필은 카드 그리드(`PostList columns`), 도서 상세는 왼쪽 판(`BookSidePanel`, sticky) + 본문의 두 단이고 휴대폰은 한 단(`BookHero` + 하단 고정 버튼). 선반(`BookShelf`)은 휴대폰에서 가로 스크롤, 넓은 화면에서 4~6열 그리드(`BookCover fluid`). 그리드 안 카드는 `items-start` 로 높이를 맞추지 않는다. 휴대폰 폭 스크린샷으로 둘 다 확인한다.
-- **페이지** (`src/app/`): `/` 홈(잡지형) · `/plaza`(독후감 피드 HOT·NEW) · `/books/[id]`(+`/reviews`·`/posts` 전체 목록) · `/posts/[id]` · `/reviews/[id]` · `/users/[id]`(닉네임·사진·숫자·공개 독후감만 — 서재·통계는 앱에서) · `/search` · `/faq`(FAQ 만, 문의는 메일) · `/legal/[key]`(백엔드 약관 원문) · `/app`(설치 안내 랜딩) · `robots.ts` · `sitemap.ts`(최근 독후감 200편과 그 책) · `opengraph-image.tsx`(사이트 공통 미리보기; 글마다는 표지·사진) · `healthz/route.ts`.
+- **페이지** (`src/app/`): `/` 홈(잡지형) · `/plaza`(독후감 피드 HOT·NEW) · `/books/[id]`(+`/reviews`·`/posts` 전체 목록) · `/posts/[id]` · `/reviews/[id]` · `/users/[id]`(닉네임·사진·숫자·공개 독후감만 — 서재·통계는 앱에서) · `/search` · `/faq`(FAQ 만, 문의는 메일) · `/legal/[key]`(백엔드 약관 원문) · `/app`(설치 안내 랜딩) · `robots.ts` · `sitemap.ts`(최근 독후감 200편과 그 책) · `opengraph-image.tsx`(사이트 공통 미리보기; 글마다는 표지·사진) · `health/route.ts`(배포 상태 확인 — compose healthcheck 가 본다).
 - **독후감 URL 은 id 기준**(`/posts/123`) — `PostView.authorHandle` 이 선택 필드라 `@handle/slug` 는 쓰지 않는다. `visibility === 'LINK'` 인 글은 `robots: noindex`.
 - **독후감 본문** (`src/lib/post/`): 앱의 `postQuotes.ts`·`postPhotos.ts` 를 그대로 옮긴 순수 TS. 줄머리 `>` 묶음은 문장 조각(`MemoScrap ruled`, 글자 그대로), `![사진](image:ID)` 한 줄은 사진 자리, 나머지만 `react-markdown` + `remark-gfm`. 본문에 자리 없는 사진은 본문 앞에. 옛 `〖오려둔 문장 N〗` 표시는 `post.quotes` 로 치환(`postBodyOf`).
 - **앱 설치 안내** (`src/components/install/`): `InstallProvider`(루트에서 한 번, 시트도 여기서 그린다) → `useInstall().open(reason)`. 쓰기 동작이 있던 자리엔 `InstallButton`(큰 버튼) / `InstallAction`(32pt 보조), 하트는 `LikeAction`(`src/components/post/`, 누르면 `like`·`bookLike` 로 연다). 이유별 문구는 `installCopy.ts`. 스토어 링크·App Store ID·문의 메일은 **런타임 환경 변수**(`src/lib/install.ts` → `getInstallConfig()`) — `NEXT_PUBLIC_*` 로 빌드에 박지 않는다. 비어 있으면 '곧 출시'. `InstallBanner` 는 휴대폰 브라우저에서만 문서 끝 sticky 띠(7일 닫힘 기억), 도서 상세·`/app` 처럼 제 주요 버튼이 있는 화면에선 뺀다. 브라우저에서만 아는 값(UA·저장소·미디어 쿼리)은 `useClientValue`/`useMediaQuery`(useSyncExternalStore)로 읽는다 — 효과 안 setState 는 lint 가 막는다.
@@ -89,4 +89,4 @@ node scripts/screenshot.mjs http://127.0.0.1:3456/plaza shot.png [--dark] [--cli
 
 ## 배포
 
-`Dockerfile`(node:24-alpine, `output: standalone`, 포트 3000, `GET /healthz`) 과 `.github/workflows/ci.yml`(검증만)은 이 리파지토리에 있다. 이미지 발행·서버 반영·nginx·DNS·인증서는 담당자 몫 — `docs/deploy-handoff.md`. 환경 변수는 `.env.example`.
+`Dockerfile`(node:24-alpine, `output: standalone`, 컨테이너 포트 8080)과 `docker-compose.yml`(프로젝트 `bookey-web`, 공개 포트 3200, healthcheck `/health`, 환경 변수 기본값)은 배포 담당자가 만든 뼈대를 그대로 쓴다 — 서버 `/opt/bookey-web` 에서 `docker compose up -d --build`, 백엔드·어드민 Compose 와 독립. `.github/workflows/ci.yml` 은 검증만(typecheck·lint·build); 서버 반영 워크플로(`Deploy web to EC2`, SSH)는 담당자가 관리한다. nginx·DNS·인증서 요구사항은 `docs/deploy-handoff.md`, 환경 변수는 `.env.example`. 개발 서버 포트도 3200 이다.

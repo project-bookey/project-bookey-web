@@ -1,6 +1,6 @@
 # project-bookey-web
 
-Bookey 조회 전용 공개 웹 — `https://www.bookey.site`. 로그인 없이 책·독후감·리뷰·공개 프로필을 둘러보고, 쓰기 동작이 있던 자리마다 앱 설치 안내가 선다.
+Bookey 조회 전용 공개 웹 — `https://www.bookey.site`. 로그인 없이 책·독후감·리뷰·공개 프로필을 둘러보고, 쓰기 동작이 있던 자리마다 앱 설치 안내가 선다. Next.js · React · TypeScript.
 
 관련 리파지토리
 - **[project-bookey-app](https://github.com/project-bookey/project-bookey-app)** — 모바일 앱(Expo). 디자인 토큰·문구 규칙의 원본.
@@ -11,20 +11,21 @@ Bookey 조회 전용 공개 웹 — `https://www.bookey.site`. 로그인 없이 
 
 ```
 project-bookey-web/
-├─ src/app/            페이지 (App Router) — 홈 · /plaza · /books/[id] · /posts/[id] · /reviews/[id] · /users/[id] · /search · /faq · /legal/[key] · /app
+├─ src/app/            페이지 (App Router) — 홈 · /plaza · /books/[id] · /posts/[id] · /reviews/[id] · /users/[id] · /search · /faq · /legal/[key] · /app · /health
 ├─ src/components/     ui(토큰 부품) · site(헤더·바닥글) · install(앱 설치 안내) · post · book · home · review
 ├─ src/lib/            api.ts(서버 전용 호출) · endpoints.ts · types.ts · format.ts · post/(본문 규칙)
 ├─ src/api/generated.ts  백엔드 OpenAPI 에서 생성한 타입 (커밋한다, 손으로 고치지 않는다)
-├─ scripts/            OpenAPI → TS 타입 생성기
+├─ scripts/            OpenAPI → TS 타입 생성기 · 휴대폰 폭 스크린샷 도구
+├─ Dockerfile · docker-compose.yml   EC2 배포(아래)
 └─ docs/deploy-handoff.md  배포 담당자 인계 문서
 ```
 
 ## 시작하기
 
 ```bash
-npm install
+npm ci
 cp .env.example .env.local        # BOOKEY_API_URL 을 로컬 백엔드(http://localhost:8080) 또는 운영 API 로
-npm run dev                       # http://localhost:3000
+npm run dev                       # http://localhost:3200
 ```
 
 데이터는 전부 서버 컴포넌트가 가져온다 — 브라우저는 이 사이트 외 어떤 API 도 부르지 않는다(CORS 무관, API 주소 비노출).
@@ -44,8 +45,8 @@ BOOKEY_API_URL=https://api.bookey.site npm run types # 운영 API 기준
 
 | 키 | 설명 |
 |---|---|
-| `BOOKEY_API_URL` | 백엔드 주소(서버 전용). 같은 compose 망이면 `http://backend:8080`, 아니면 `https://api.bookey.site` |
-| `SITE_URL` | 이 사이트의 공개 주소 — canonical·OG·사이트맵 |
+| `BOOKEY_API_URL` | 백엔드 주소(서버 전용). 기본 `https://api.bookey.site` |
+| `SITE_URL` | 이 사이트의 공개 주소 — canonical·OG·사이트맵. 기본 `https://www.bookey.site` |
 | `APP_STORE_URL` · `PLAY_STORE_URL` | 스토어 링크. 비어 있으면 '곧 출시' 안내. 런타임 값이라 넣고 컨테이너만 다시 띄우면 된다 |
 | `APP_STORE_ID` | App Store 숫자 ID — 있으면 iOS Safari 스마트 배너 |
 | `SUPPORT_EMAIL` | 문의 메일 |
@@ -56,7 +57,20 @@ BOOKEY_API_URL=https://api.bookey.site npm run types # 운영 API 기준
 npm run typecheck
 npm run lint
 npm run build
-docker build -t bookey-web . && docker run --rm -p 3000:3000 -e BOOKEY_API_URL=https://api.bookey.site bookey-web
+docker compose up -d --build      # http://localhost:3200 · 상태 확인 /health
 ```
 
-배포(nginx·DNS·인증서·compose)는 `docs/deploy-handoff.md` 를 따른다.
+## 배포
+
+`main` 푸시 시 GitHub Actions(`CI`)가 typecheck · lint · build 를 검증한다. 서버 반영은 별도 워크플로(`Deploy web to EC2`, 배포 담당자 관리)가 기존 Bookey EC2 에 SSH 로 접속해 `/opt/bookey-web` 에서 `docker compose up -d --build` 로 띄운다 — Compose 프로젝트 `bookey-web` 은 백엔드·어드민 Compose 와 독립적으로 돈다. 공개 포트 `3200`(컨테이너 안 `8080`), 상태 확인 `/health`. 환경 변수는 `/opt/bookey-web/.env`.
+
+Repository Secrets (배포 워크플로):
+
+| 이름 | 값 |
+| --- | --- |
+| `EC2_HOST` | EC2 IP 또는 DNS |
+| `EC2_USER` | `ec2-user` |
+| `EC2_SSH_KEY` | EC2 접속용 private key |
+| `EC2_SSH_KNOWN_HOSTS` | 검증된 서버 SSH host key 의 known_hosts 항목 |
+
+서버에는 Docker 와 Compose 가 필요하고, 배포 사용자가 `/opt/bookey-web` 에 쓸 수 있어야 한다. 웹 접속을 위해 보안 그룹에서 TCP 3200 을 허용하거나(임시), host nginx 가 `www.bookey.site` 를 `127.0.0.1:3200` 으로 프록시한다 — nginx·DNS·인증서 요구사항은 `docs/deploy-handoff.md`.
